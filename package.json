@@ -1,0 +1,14 @@
+{
+  "name": "fullstack-typescript-starter",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": { "node": ">=22.12.0" },
+  "devDependencies": { "typescript": "^5.9.3", "concurrently": "^9.2.1", "@types/node": "^24.0.0" },
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm run dev -w @starter/api\" \"npm run dev -w @starter/web\"",
+    "build": "npm run build -w @starter/api && npm run build -w @starter/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "start": "npm run start -w @starter/api"
+  }
+}
