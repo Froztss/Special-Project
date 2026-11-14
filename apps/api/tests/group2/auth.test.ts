@@ -1,8 +1,8 @@
 ﻿import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createApp } from '../src/app.js';
-import { InMemoryUserRepository } from '../src/users/userRepository.js';
+import { createApp } from '../../src/app.js';
+import { InMemoryUserRepository } from '../../src/users/userRepository.js';
 
 const valid = { name: 'Ana', email: 'ana@example.com', password: 'password123', role: 'caregiver' };
 let app: ReturnType<typeof createApp>;
