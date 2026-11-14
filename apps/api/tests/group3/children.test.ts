@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { findScheduleByChildAndDate, resetStore, tasksForSchedule } from '../mocks/data.js';
-import { createTestApp } from '../testing/testApp.js';
+import { createTestApp } from '../../src/testing/testApp.js';
+import { findScheduleByChildAndDate, resetStore, tasksForSchedule } from '../../src/mocks/data.js';
 
 const { app, alice, bob } = await createTestApp();
 const profile = { name: 'Sam', age: 5, delay_domain: 'speech', avatar: '🐼' };
