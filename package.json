@@ -9,6 +9,7 @@
     "dev": "concurrently -k -n api,web \"npm run dev -w @starter/api\" \"npm run dev -w @starter/web\"",
     "build": "npm run build -w @starter/api && npm run build -w @starter/web",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "hooks:install": "node scripts/install-hooks.mjs",
     "start": "npm run start -w @starter/api"
   }
 }
