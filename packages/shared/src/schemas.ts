@@ -6,6 +6,25 @@ export const activityCategorySchema = z.enum(['hygiene', 'food', 'school', 'play
 export const pictureCardCategorySchema = z.enum(['Food', 'Emotions', 'Activities', 'Needs']);
 export const positiveIdSchema = z.coerce.number().int().positive();
 
+export const PREDEFINED_AVATARS = ['🦊', '🐼', '🐰', '🐻', '🐱', '🐶'] as const;
+
+const childProfileFields = z.strictObject({
+  name: z.string().trim().min(1).max(100),
+  age: z.number().int().min(0).max(120),
+  delay_domain: childDelayDomainSchema,
+  notes: z.string().trim().max(2000).nullable().optional(),
+  avatar: z.enum(PREDEFINED_AVATARS),
+});
+
+export const createChildSchema = childProfileFields.extend({
+  avatar: childProfileFields.shape.avatar.default(PREDEFINED_AVATARS[0]),
+});
+
+export const updateChildSchema = childProfileFields.partial().refine(
+  (value) => Object.values(value).some((field) => field !== undefined),
+  'Provide at least one of name, age, delay_domain, notes, avatar',
+);
+
 const isoDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'date must be in YYYY-MM-DD format')
