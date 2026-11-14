@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp } from '../../src/testing/testApp.js';
 import { resetStore } from '../../src/mocks/data.js';
 
-const { app, alice, bob } = await createTestApp();
+const { app, alice, bob, group5Repository } = await createTestApp();
 
 interface Card {
   id: number;
@@ -11,16 +11,21 @@ interface Card {
   category: 'Food' | 'Emotions' | 'Activities' | 'Needs';
   label: string;
   icon: string;
+  is_hidden: boolean;
 }
 
-const DEFAULT_LABELS = [
-  'Water', 'Milk', 'Rice', 'Bread',
-  'Happy', 'Sad', 'Tired',
-  'Play', 'TV',
-  'Toilet',
-];
+type CardGroups = Record<Card['category'], Card[]>;
 
-beforeEach(() => resetStore());
+const CATEGORIES = ['Food', 'Emotions', 'Activities', 'Needs'] as const;
+
+function flatten(groups: CardGroups): Card[] {
+  return CATEGORIES.flatMap((category) => groups[category]);
+}
+
+beforeEach(() => {
+  resetStore();
+  group5Repository.reset();
+});
 
 describe('GET /api/cards (task 5.1)', () => {
   it('requires a valid token', async () => {
@@ -33,22 +38,21 @@ describe('GET /api/cards (task 5.1)', () => {
     }
   });
 
-  it('serves the shared default library grouped across the four categories', async () => {
+  it('serves the shared default library grouped by the four categories', async () => {
     const res = await request(app).get('/api/cards').set(alice).query({ childId: 1 });
     expect(res.status).toBe(200);
-    const cards = res.body as Card[];
-    expect(Array.isArray(cards)).toBe(true);
-    expect(cards.map((card) => card.label)).toEqual(expect.arrayContaining(DEFAULT_LABELS));
-    expect(new Set(cards.map((card) => card.category))).toEqual(
-      new Set(['Food', 'Emotions', 'Activities', 'Needs']),
-    );
-    for (const card of cards) {
+    expect(Object.keys(res.body)).toEqual([...CATEGORIES]);
+    const groups = res.body as CardGroups;
+    expect(groups.Food.map((card) => card.label)).toEqual(['Water', 'Milk', 'Rice', 'Bread']);
+    expect(groups.Emotions.map((card) => card.label)).toEqual(['Happy', 'Sad', 'Tired']);
+    expect(groups.Activities.map((card) => card.label)).toEqual(['Play', 'TV']);
+    expect(groups.Needs.map((card) => card.label)).toEqual(['Toilet']);
+    for (const card of flatten(groups)) {
       expect(card.id).toBeGreaterThan(0);
-      expect(card.label.length).toBeGreaterThan(0);
+      expect(card.child_id).toBeNull();
+      expect(card.is_hidden).toBe(false);
       expect(card.icon.length).toBeGreaterThan(0);
     }
-    const defaults = cards.filter((card) => DEFAULT_LABELS.includes(card.label));
-    expect(defaults.every((card) => card.child_id === null)).toBe(true);
   });
 
   it('serves the same defaults to every owner for their own child', async () => {
@@ -56,8 +60,7 @@ describe('GET /api/cards (task 5.1)', () => {
     const second = await request(app).get('/api/cards').set(bob).query({ childId: 3 });
     expect(first.status).toBe(200);
     expect(second.status).toBe(200);
-    const labels = (body: Card[]) => body.map((card) => card.label).sort();
-    expect(labels(first.body)).toEqual(labels(second.body));
+    expect(flatten(first.body)).toEqual(flatten(second.body));
   });
 
   it('rejects a missing or malformed childId with 400', async () => {
