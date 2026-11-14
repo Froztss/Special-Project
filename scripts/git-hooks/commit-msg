@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+// commit-msg hook: enforce Conventional Commits (https://www.conventionalcommits.org).
+const { readFileSync } = require('node:fs');
+
+const raw = readFileSync(process.argv[2], 'utf8');
+const subject = raw.split('\n').find((line) => line.trim() !== '' && !line.startsWith('#')) ?? '';
+
+if (/^Merge /i.test(subject)) {
+  process.exit(0);
+}
+
+const TYPES = ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'build', 'ci', 'chore', 'revert'];
+const pattern = new RegExp(`^(${TYPES.join('|')})(\\([a-z0-9._-]+\\))?!?: .+$`);
+
+if (!pattern.test(subject) || subject.length > 72) {
+  console.error('Commit message does not follow the Conventional Commits format.');
+  console.error('Expected: <type>(<optional scope>): <description>  (max 72 characters)');
+  console.error(`Types: ${TYPES.join(', ')}`);
+  console.error('Examples:');
+  console.error('  feat(api): add schedule copy endpoint');
+  console.error('  fix(web): correct task order after drag-and-drop');
+  console.error(`Received: ${subject || '(empty message)'}`);
+  process.exit(1);
+}
