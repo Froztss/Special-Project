@@ -1,7 +1,7 @@
 import { Router, type Request } from 'express';
 import { asyncHandler, HttpError } from '../lib/errors.js';
 import { parse } from '../lib/validate.js';
-import { currentUser, requireAuth } from '../mocks/auth.js';
+import { currentUser } from '../middleware/requireAuth.js';
 import * as data from '../mocks/data.js';
 import {
   completeTaskSchema,
@@ -11,7 +11,6 @@ import {
 } from '@starter/shared';
 
 export const tasksRouter = Router();
-tasksRouter.use(requireAuth);
 
 function ownedTask(req: Request, id: number): data.Task {
   const task = data.findTaskForUser(id, currentUser(req).id);

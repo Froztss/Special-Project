@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express from 'express';
+import { requireAuth } from './middleware/requireAuth.js';
 import { errorHandler } from './lib/errors.js';
 import { healthRouter } from './routes/health.js';
 import { authRouter } from './routes/auth.js';
@@ -20,8 +21,8 @@ app.use(cors({
 app.use(express.json({ limit: '100kb' }));
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter(users));
-app.use('/api/schedules', schedulesRouter);
-app.use('/api/tasks', tasksRouter);
+app.use('/api/schedules', requireAuth(users), schedulesRouter);
+app.use('/api/tasks', requireAuth(users), tasksRouter);
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });
 });

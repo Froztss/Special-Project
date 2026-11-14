@@ -1,10 +1,20 @@
-import type { RequestHandler } from 'express';
+import type { Request, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { getJwtSecret } from '../config.js';
 import { HttpError } from '../lib/errors.js';
 import type { PublicUser, UserRepository } from '../users/userRepository.js';
 
-// Request.user is declared in mocks/auth.ts until the mock is removed.
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: PublicUser;
+  }
+}
+
+/** The authenticated user; only valid on routes behind equireAuth. */
+export function currentUser(req: Request): PublicUser {
+  if (!req.user) throw new HttpError(401, 'Authentication required');
+  return req.user;
+}
 
 /** Verifies the Bearer token and attaches the user to the request (FR-AUTH-05). */
 export function requireAuth(users: UserRepository): RequestHandler {
