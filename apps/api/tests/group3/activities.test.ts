@@ -1,7 +1,7 @@
 import type { Activity } from '@starter/shared';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { createTestApp } from '../testing/testApp.js';
+import { createTestApp } from '../../src/testing/testApp.js';
 
 const { app, alice, bob } = await createTestApp();
 
@@ -23,6 +23,7 @@ describe('GET /api/activities', () => {
     expect(second.status).toBe(200);
     expect(first.body).toEqual(second.body);
     const activities = first.body as Activity[];
+    expect(activities).toHaveLength(12);
     expect(activities.map((activity) => activity.name)).toEqual(expect.arrayContaining([
       'Wake up', 'Brush teeth', 'Wash hands', 'Eat breakfast', 'Get dressed',
       'Toilet', 'Go to school', 'Learning activity', 'Play', 'Bath', 'Get ready for bed',

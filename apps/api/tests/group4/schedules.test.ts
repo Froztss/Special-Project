@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createTestApp } from '../testing/testApp.js';
-import { resetStore } from '../mocks/data.js';
+import { createTestApp } from '../../src/testing/testApp.js';
+import { resetStore } from '../../src/mocks/data.js';
 
 const { app, alice, bob } = await createTestApp();
 const DATE = '2026-11-14';
