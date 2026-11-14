@@ -8,7 +8,7 @@ import {
   createTaskSchema,
   idParamSchema,
   updateTaskSchema,
-} from '../schemas.js';
+} from '@starter/shared';
 
 export const tasksRouter = Router();
 tasksRouter.use(requireAuth);

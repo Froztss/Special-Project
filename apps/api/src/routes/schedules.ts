@@ -8,7 +8,7 @@ import {
   idParamSchema,
   scheduleQuerySchema,
   updateScheduleSchema,
-} from '../schemas.js';
+} from '@starter/shared';
 
 export const schedulesRouter = Router();
 schedulesRouter.use(requireAuth);

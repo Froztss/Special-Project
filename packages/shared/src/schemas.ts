@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export const userRoleSchema = z.enum(['caregiver', 'ot', 'sped_teacher']);
+export const childDelayDomainSchema = z.enum(['speech', 'motor', 'cognitive', 'social', 'general']);
+export const activityCategorySchema = z.enum(['hygiene', 'food', 'school', 'play', 'other']);
+export const pictureCardCategorySchema = z.enum(['Food', 'Emotions', 'Activities', 'Needs']);
+export const positiveIdSchema = z.coerce.number().int().positive();
+
 const isoDate = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'date must be in YYYY-MM-DD format')
@@ -64,3 +70,8 @@ export const updateTaskSchema = z
 export const completeTaskSchema = z.object({
   done: z.boolean(),
 });
+
+export type UserRole = z.infer<typeof userRoleSchema>;
+export type ChildDelayDomain = z.infer<typeof childDelayDomainSchema>;
+export type ActivityCategory = z.infer<typeof activityCategorySchema>;
+export type PictureCardCategory = z.infer<typeof pictureCardCategorySchema>;

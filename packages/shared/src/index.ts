@@ -1,5 +1,8 @@
+export * from './schemas.js';
+
 export interface HealthResponse {
-  status: 'ok';
+  status: 'ok' | 'error';
+  database: 'connected' | 'disconnected';
   message: string;
   timestamp: string;
 }
