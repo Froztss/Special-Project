@@ -67,6 +67,33 @@ The seed-only demo caregiver has no login password; create a normal account to u
 
 ## Extend the template
 
+### Child profiles and activity library (temporary mocks)
+
+Group 3 currently shares the in-memory data and mock authentication used by schedules/tasks. Use `Authorization: Bearer 1` for Alice (children Mia and Leo) or `Authorization: Bearer 2` for Bob (child Ava). These tokens are development fixtures, not JWTs. All changes reset when the server restarts. Group 1 provides the database foundation; these feature routes still need MySQL integration, JWT authentication from Group 2, and custom-card cascade verification. The mock users/children are separate from MySQL seed records. See [the backend plan](docs/BACKEND_TASKS.md).
+
+| Method and path | Response |
+| --- | --- |
+| `GET /api/children` | `200`, array of the caller's children (empty array if none) |
+| `POST /api/children` | `201`, created child |
+| `GET /api/children/:id` | `200`, owned child |
+| `PUT /api/children/:id` | `200`, updated child; accepts a nonempty partial update |
+| `DELETE /api/children/:id` | `200`, `{ "success": true }`; removes mock schedules and their tasks |
+| `GET /api/activities` | `200`, array of shared activities with `id`, `name`, `icon`, `category` |
+
+All six endpoints require authentication. Missing/invalid tokens return `401`; invalid input returns `400`; missing or another user's child returns the same `404`. Errors use `{ "error": "message" }`. Ownership comes from authentication; client-supplied ids, ownership and timestamps are rejected in child bodies. Deletion confirmation belongs in the frontend.
+
+Example create body:
+
+```json
+{ "name": "Sam", "age": 5, "delay_domain": "speech", "notes": "Likes music", "avatar": "🐼" }
+```
+
+The current validation choices are: trimmed name (1–100 characters), integer age (0–120), delay domain (`speech`, `motor`, `cognitive`, `social`, `general`), optional notes (up to 2,000 characters, or `null` to clear), and an optional avatar (`🦊`, `🐼`, `🐰`, `🐻`, `🐱`, `🐶`; defaults to `🦊` on create). A partial update preserves omitted fields. Shared TypeScript contracts are in [the shared package](packages/shared/src/index.ts); runtime schemas live in [the shared schemas](packages/shared/src/schemas.ts).
+
+Run API tests with `npm run test -w @starter/api`. The suite covers child CRUD, validation, cross-user isolation, actual mock schedule/task removal, and use of newly created children and library activities in schedules. The MySQL/custom-card cascade and restart persistence checks are explicitly deferred.
+
+### Adding features
+
 Add API routes under `apps/api/src/routes`, UI components under `apps/web/src/components`, and shared contracts and Zod schemas under `packages/shared/src`. Use shared schemas at API boundaries to validate user input.
 
 ## Deployment

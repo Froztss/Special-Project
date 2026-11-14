@@ -1,22 +1,8 @@
-// Mock stand-in for the Group 1 MySQL layer and Group 3 child/activity data access.
+// Mock stand-in for the Group 1 MySQL layer, used by Groups 3 and 4.
 // In-memory only; replace with parameterized SQL while keeping these signatures.
-export interface Child {
-  id: number;
-  user_id: number;
-  name: string;
-  age: number;
-  delay_domain: string;
-  notes: string | null;
-  avatar: string;
-  created_at: string;
-}
+import type { Activity, Child, ChildProfileInput, ChildProfileUpdate } from '@starter/shared';
 
-export interface Activity {
-  id: number;
-  name: string;
-  icon: string;
-  category: 'hygiene' | 'food' | 'school' | 'play' | 'other';
-}
+export type { Activity, Child } from '@starter/shared';
 
 export interface Schedule {
   id: number;
@@ -62,6 +48,7 @@ interface Store {
   children: Child[];
   schedules: Schedule[];
   tasks: Task[];
+  nextChildId: number;
   nextScheduleId: number;
   nextTaskId: number;
 }
@@ -75,6 +62,7 @@ function seed(): Store {
     ],
     schedules: [],
     tasks: [],
+    nextChildId: 4,
     nextScheduleId: 1,
     nextTaskId: 1,
   };
@@ -88,6 +76,49 @@ export function resetStore(): void {
 
 export function findChildForUser(childId: number, userId: number): Child | undefined {
   return store.children.find((c) => c.id === childId && c.user_id === userId);
+}
+
+export function listChildrenForUser(userId: number): Child[] {
+  return store.children.filter((child) => child.user_id === userId);
+}
+
+export function createChildForUser(userId: number, input: ChildProfileInput): Child {
+  const child: Child = {
+    id: store.nextChildId++,
+    user_id: userId,
+    name: input.name,
+    age: input.age,
+    delay_domain: input.delay_domain,
+    notes: input.notes ?? null,
+    avatar: input.avatar ?? '🦊',
+    created_at: new Date().toISOString(),
+  };
+  store.children.push(child);
+  return child;
+}
+
+export function updateChildForUser(
+  childId: number,
+  userId: number,
+  patch: ChildProfileUpdate,
+): Child | undefined {
+  const child = findChildForUser(childId, userId);
+  if (!child) return undefined;
+  if (patch.name !== undefined) child.name = patch.name;
+  if (patch.age !== undefined) child.age = patch.age;
+  if (patch.delay_domain !== undefined) child.delay_domain = patch.delay_domain;
+  if (patch.notes !== undefined) child.notes = patch.notes;
+  if (patch.avatar !== undefined) child.avatar = patch.avatar;
+  return child;
+}
+
+export function deleteChildForUser(childId: number, userId: number): boolean {
+  if (!findChildForUser(childId, userId)) return false;
+  for (const schedule of store.schedules.filter((item) => item.child_id === childId)) {
+    deleteSchedule(schedule.id);
+  }
+  store.children = store.children.filter((child) => child.id !== childId);
+  return true;
 }
 
 export function listActivities(): Activity[] {
