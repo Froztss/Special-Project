@@ -8,6 +8,8 @@ import { errorHandler, HttpError } from '../../src/lib/errors.js';
 import { parse, validateBody, validateQuery } from '../../src/lib/validate.js';
 import { createTestApp } from '../../src/testing/testApp.js';
 
+const { app: testApp, alice } = await createTestApp();
+
 describe('1.5 validation', () => {
   it('parse returns typed data for valid input', () => {
     expect(parse(z.object({ n: z.number() }), { n: 5 })).toEqual({ n: 5 });
@@ -53,7 +55,6 @@ describe('1.5 validation', () => {
   });
 
   it('routes reject invalid bodies with the uniform 400 shape', async () => {
-    const { app: testApp, alice } = await createTestApp();
     const res = await request(testApp)
       .post('/api/schedules')
       .set(alice)
