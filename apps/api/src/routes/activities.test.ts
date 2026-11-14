@@ -1,7 +1,9 @@
 import type { Activity } from '@starter/shared';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { app } from '../app.js';
+import { createTestApp } from '../testing/testApp.js';
+
+const { app, alice, bob } = await createTestApp();
 
 describe('GET /api/activities', () => {
   it('requires a valid token', async () => {
@@ -15,8 +17,8 @@ describe('GET /api/activities', () => {
   });
 
   it('serves the same predefined library to both users, with stable ids and categories', async () => {
-    const first = await request(app).get('/api/activities').set('Authorization', 'Bearer 1');
-    const second = await request(app).get('/api/activities').set('Authorization', 'Bearer 2');
+    const first = await request(app).get('/api/activities').set(alice);
+    const second = await request(app).get('/api/activities').set(bob);
     expect(first.status).toBe(200);
     expect(second.status).toBe(200);
     expect(first.body).toEqual(second.body);

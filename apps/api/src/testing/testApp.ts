@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { createApp } from '../app.js';
+import { InMemoryGroup5Repository } from '../mocks/group5Repository.js';
 import { InMemoryUserRepository } from '../users/userRepository.js';
 
 /**
@@ -7,7 +8,8 @@ import { InMemoryUserRepository } from '../users/userRepository.js';
  * through the real auth endpoints. Ids match the mock data owners (alice = 1, bob = 2).
  */
 export async function createTestApp() {
-  const app = createApp(new InMemoryUserRepository());
+  const group5Repository = new InMemoryGroup5Repository();
+  const app = createApp(new InMemoryUserRepository(), group5Repository);
 
   async function signUp(name: string, role: 'caregiver' | 'ot') {
     const email = `${name.toLowerCase()}@example.com`;
@@ -19,5 +21,5 @@ export async function createTestApp() {
 
   const alice = await signUp('Alice', 'caregiver');
   const bob = await signUp('Bob', 'ot');
-  return { app, alice, bob };
+  return { app, alice, bob, group5Repository };
 }

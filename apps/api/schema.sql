@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS picture_cards (
   category ENUM('Food', 'Emotions', 'Activities', 'Needs') NOT NULL,
   label VARCHAR(100) NOT NULL,
   icon VARCHAR(32) NOT NULL,
+  is_hidden BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_picture_cards_child_category (child_id, category),
