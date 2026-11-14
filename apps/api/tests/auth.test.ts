@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+﻿import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
@@ -98,6 +98,6 @@ describe('errors', () => {
     expect((await request(app).get('/api/nope')).body).toEqual({ error: 'Not found' });
     const res = await request(app).post('/api/auth/login').set('Content-Type', 'application/json').send('{bad');
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ error: 'Invalid request body' });
+    expect(res.body).toEqual({ error: 'Invalid JSON body' });
   });
 });

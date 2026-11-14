@@ -19,11 +19,11 @@ Groups run in dependency order: **1 → 2 → 3 → 4 → 5**. Tasks within a gr
 
 ## Group 1 — Database foundation & API plumbing
 
-- [ ] **1.1 MySQL connection module** — `mysql2/promise` pool configured by env (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`); add vars to `apps/api/.env.example`; verify connectivity at startup and expose a DB check on `/api/health`. (NFR-SEC-02/05, NFR-REL-01)
-- [ ] **1.2 Schema script** — `schema.sql` with all §7.1 tables (`users`, `children`, `activities`, `schedules`, `tasks`, `picture_cards`, `settings`); unique `users.email`; unique `(child_id, schedule_date)`; FK cascades child → schedules → tasks and child → custom cards (§7.2); `npm run db:schema`.
-- [ ] **1.3 Seed script** — idempotent seeds: activity library with icons/categories (FR-SCH-01), default picture cards in Food / Emotions / Activities / Needs (FR-COMM-02), three demo children with sample schedules (§2.6); `npm run db:seed`.
-- [ ] **1.4 Uniform error handling** — central error middleware returning `{ "error": "message" }` with the §6.2 status codes (400/401/403/404/409/500); async route wrapper so rejections reach it; keep the existing JSON 404.
-- [ ] **1.5 Validation & CORS setup** — zod installed, shared schema home in `packages/shared`, a parse-or-400 middleware/helper for route bodies and queries; `cors` restricted to the configured frontend origin (NFR-SEC-03/04).
+- [x] **1.1 MySQL connection module** — `mysql2/promise` pool configured by env (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`); add vars to `apps/api/.env.example`; verify connectivity at startup and expose a DB check on `/api/health`. (NFR-SEC-02/05, NFR-REL-01)
+- [x] **1.2 Schema script** — `schema.sql` with all §7.1 tables (`users`, `children`, `activities`, `schedules`, `tasks`, `picture_cards`, `settings`); unique `users.email`; unique `(child_id, schedule_date)`; FK cascades child → schedules → tasks and child → custom cards (§7.2); `npm run db:schema`.
+- [x] **1.3 Seed script** — idempotent seeds: activity library with icons/categories (FR-SCH-01), default picture cards in Food / Emotions / Activities / Needs (FR-COMM-02), three demo children with sample schedules (§2.6); `npm run db:seed`.
+- [x] **1.4 Uniform error handling** — central error middleware returning `{ "error": "message" }` with the §6.2 status codes (400/401/403/404/409/500); async route wrapper so rejections reach it; keep the existing JSON 404.
+- [x] **1.5 Validation & CORS setup** — zod installed, shared schema home in `packages/shared`, a parse-or-400 middleware/helper for route bodies and queries; `cors` restricted to the configured frontend origin (NFR-SEC-03/04).
 
 **Group exit criteria:** schema + seeds apply cleanly on local MySQL; API boots with DB connectivity reported; every error uses the uniform shape; validation and CORS plumbing ready for feature routes.
 
@@ -51,13 +51,15 @@ Groups run in dependency order: **1 → 2 → 3 → 4 → 5**. Tasks within a gr
 
 ## Group 4 — Schedules & tasks (SCH + TASK)
 
-- [ ] **4.1 Schedule read** — `GET /api/schedules?childId=&date=` returning the schedule with tasks ordered by `position`; ownership via the child. (FR-SCH-02, FR-TASK-05)
-- [ ] **4.2 Schedule create & copy** — `POST /api/schedules` for child + date (409 on duplicate date); optional `copyFrom` date duplicates that day's tasks. (FR-SCH-02/09)
-- [ ] **4.3 Schedule update & delete** — `PUT, DELETE /api/schedules/:id` with ownership checks.
-- [ ] **4.4 Task add & edit** — `POST /api/tasks` (library activity or custom name + predefined icon, FR-SCH-08); `PUT /api/tasks/:id` for optional `start_time` (HH:MM), `duration_min`, and `position` reordering. (FR-SCH-04/05)
-- [ ] **4.5 Task remove** — `DELETE /api/tasks/:id` with ownership through the schedule's child. (FR-SCH-06)
-- [ ] **4.6 Complete & undo** — `PATCH /api/tasks/:id/complete`: set `done` + `completed_at` timestamp; undo returns to `pending` and clears it. (FR-TASK-01–04)
-- [ ] **4.7 Schedule/task tests** — create → add → reorder → complete → undo flow; duplicate-date 409; cross-user access rejected; state survives a server restart. (NFR-REL-01, NFR-SEC-06)
+> **Status note:** Group 4 is implemented ahead of Groups 1–3 and runs on temporary mocks in `apps/api/src/mocks/` (Bearer token = mock user id; in-memory children/activities/schedules/tasks). Swap in the real JWT `requireAuth` and MySQL data access when Groups 1–3 land; route handlers, zod schemas and tests stay as they are. The 4.7 restart-persistence check is a `todo` test until the real DB exists.
+
+- [x] **4.1 Schedule read** — `GET /api/schedules?childId=&date=` returning the schedule with tasks ordered by `position`; ownership via the child. (FR-SCH-02, FR-TASK-05)
+- [x] **4.2 Schedule create & copy** — `POST /api/schedules` for child + date (409 on duplicate date); optional `copyFrom` date duplicates that day's tasks. (FR-SCH-02/09)
+- [x] **4.3 Schedule update & delete** — `PUT, DELETE /api/schedules/:id` with ownership checks.
+- [x] **4.4 Task add & edit** — `POST /api/tasks` (library activity or custom name + predefined icon, FR-SCH-08); `PUT /api/tasks/:id` for optional `start_time` (HH:MM), `duration_min`, and `position` reordering. (FR-SCH-04/05)
+- [x] **4.5 Task remove** — `DELETE /api/tasks/:id` with ownership through the schedule's child. (FR-SCH-06)
+- [x] **4.6 Complete & undo** — `PATCH /api/tasks/:id/complete`: set `done` + `completed_at` timestamp; undo returns to `pending` and clears it. (FR-TASK-01–04)
+- [x] **4.7 Schedule/task tests** — create → add → reorder → complete → undo flow; duplicate-date 409; cross-user access rejected; state survives a server restart *(restart check deferred — see note)*. (NFR-REL-01, NFR-SEC-06)
 
 **Group exit criteria:** the full schedule/task lifecycle works via API, ordered and timestamped, with ownership enforced at every step.
 

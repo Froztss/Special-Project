@@ -6,9 +6,16 @@ An npm workspace with React + Vite, Express, and a shared types package. Require
 apps/
   api/
     src/
-      routes/health.ts   # GET /api/health
-      app.ts            # Express application
-      server.ts         # Environment, listener, shutdown
+      db/pool.ts          # MySQL pool and connectivity checks
+      lib/errors.ts       # Async routes and API errors
+      lib/validate.ts     # Request validation helpers
+      routes/health.ts    # GET /api/health
+      app.ts              # Express application and CORS
+      server.ts           # Environment, listener, shutdown
+    scripts/
+      schema.ts          # Apply schema.sql
+      seed.ts            # Seed library and demo schedules
+    schema.sql
     .env.example
     tsconfig.json
   web/
@@ -23,7 +30,8 @@ apps/
     tsconfig.json
 packages/
   shared/
-    src/index.ts        # Shared contracts (type-only imports)
+    src/index.ts        # Shared API contracts
+    src/schemas.ts      # Shared Zod schemas
     tsconfig.json
 package.json
 tsconfig.base.json
@@ -31,24 +39,35 @@ tsconfig.base.json
 
 ## Run locally
 
+Start MySQL and create the `special_project` database. Copy `apps/api/.env.example` to
+`apps/api/.env`, then set your MySQL credentials and the frontend origin:
+
 ```sh
 npm install
+npm run db:schema
+npm run db:seed
 npm run dev
 ```
 
-Open http://localhost:5173. The API listens on http://localhost:3001. Vite proxies `/api` requests to the backend. Defaults work without environment files; copy each app's `.env.example` to `.env` to customize. On PowerShell systems that block npm.ps1, use `npm.cmd` instead of `npm`.
+Open http://localhost:5173. The API listens on http://localhost:3001 and verifies its
+database connection before starting. Vite proxies `/api` requests to the backend.
+Copy `apps/web/.env.example` to `apps/web/.env` only if you need to customize the frontend.
+On PowerShell systems that block npm.ps1, use `npm.cmd` instead of `npm`.
+The seed-only demo caregiver has no login password; create a normal account to use the API.
 
 ## Commands
 
 - `npm run dev`: run both apps with automatic reload.
 - `npm run typecheck`: check every workspace.
-- `npm run build`: compile the API and build the frontend.
+- `npm run build`: compile shared schemas and the API, then build the frontend.
+- `npm run db:schema`: create the database tables (the database itself must already exist).
+- `npm run db:seed`: add the activity library, default cards, and demo schedules.
 - `npm start`: run the compiled API after building.
 - `npm run preview -w @starter/web`: preview the frontend build locally (no development API proxy).
 
 ## Extend the template
 
-Add API routes under `apps/api/src/routes`, UI components under `apps/web/src/components`, and shared contracts under `packages/shared/src`. Shared exports are types only; use `import type`. Add runtime validation at API boundaries when introducing user input. No database or authentication provider is assumed.
+Add API routes under `apps/api/src/routes`, UI components under `apps/web/src/components`, and shared contracts and Zod schemas under `packages/shared/src`. Use shared schemas at API boundaries to validate user input.
 
 ## Deployment
 

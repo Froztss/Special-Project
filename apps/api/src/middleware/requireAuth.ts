@@ -1,14 +1,10 @@
 import type { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { getJwtSecret } from '../config.js';
-import { HttpError } from '../errors.js';
+import { HttpError } from '../lib/errors.js';
 import type { PublicUser, UserRepository } from '../users/userRepository.js';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: PublicUser;
-  }
-}
+// Request.user is declared in mocks/auth.ts until the mock is removed.
 
 /** Verifies the Bearer token and attaches the user to the request (FR-AUTH-05). */
 export function requireAuth(users: UserRepository): RequestHandler {

@@ -3,7 +3,8 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { loginSchema, registerSchema } from '../auth/schemas.js';
 import { getJwtSecret, JWT_EXPIRES_IN } from '../config.js';
-import { HttpError, parseOrThrow } from '../errors.js';
+import { HttpError } from '../lib/errors.js';
+import { parse } from '../lib/validate.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import type { UserRepository } from '../users/userRepository.js';
 
@@ -15,7 +16,7 @@ export function authRouter(users: UserRepository): Router {
   const router = Router();
 
   router.post('/register', async (req, res) => {
-    const input = parseOrThrow(registerSchema, req.body);
+    const input = parse(registerSchema, req.body);
     const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
     const user = await users.insert({
       name: input.name,
@@ -28,7 +29,7 @@ export function authRouter(users: UserRepository): Router {
   });
 
   router.post('/login', async (req, res) => {
-    const input = parseOrThrow(loginSchema, req.body);
+    const input = parse(loginSchema, req.body);
     const row = await users.findByEmailWithHash(input.email);
     const ok = await bcrypt.compare(input.password, row?.passwordHash ?? DUMMY_HASH);
     if (!row || !ok) throw new HttpError(401, 'Invalid email or password');
