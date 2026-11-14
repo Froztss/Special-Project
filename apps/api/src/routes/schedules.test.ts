@@ -1,10 +1,9 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { app } from '../app.js';
+import { createTestApp } from '../testing/testApp.js';
 import { resetStore } from '../mocks/data.js';
 
-const alice = { Authorization: 'Bearer 1' };
-const bob = { Authorization: 'Bearer 2' };
+const { app, alice, bob } = await createTestApp();
 const DATE = '2026-11-14';
 
 beforeEach(() => {
