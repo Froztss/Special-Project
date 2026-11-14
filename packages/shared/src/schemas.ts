@@ -90,6 +90,36 @@ export const completeTaskSchema = z.object({
   done: z.boolean(),
 });
 
+export const cardQuerySchema = z.object({
+  childId: z.coerce.number().int().positive(),
+  includeHidden: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
+});
+
+export const createCardSchema = z.strictObject({
+  childId: z.number().int().positive(),
+  label: z.string().trim().min(1).max(100),
+  category: pictureCardCategorySchema,
+  icon: z.string().min(1),
+});
+
+export const updateCardVisibilitySchema = z.strictObject({
+  hidden: z.boolean(),
+});
+
+export const progressQuerySchema = z.object({
+  range: z.enum(['7d']).default('7d'),
+});
+
+export const updateSettingsSchema = z.strictObject({
+  font_size: z.enum(['small', 'medium', 'large']),
+  contrast: z.enum(['normal', 'high']),
+  sound_on: z.boolean(),
+});
+
+export const updateProfileSchema = z.strictObject({
+  name: z.string().trim().min(1).max(100),
+});
+
 export type UserRole = z.infer<typeof userRoleSchema>;
 export type ChildDelayDomain = z.infer<typeof childDelayDomainSchema>;
 export type ActivityCategory = z.infer<typeof activityCategorySchema>;

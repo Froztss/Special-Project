@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { readFile } from 'node:fs/promises';
+import type { RowDataPacket } from 'mysql2/promise';
 import { closeDatabasePool, getDatabasePool } from '../src/db/pool.js';
 
 async function applySchema(): Promise<void> {
@@ -11,6 +12,14 @@ async function applySchema(): Promise<void> {
     try {
       for (const statement of statements) {
         await connection.query(statement);
+      }
+      const [columns] = await connection.query<RowDataPacket[]>(
+        "SHOW COLUMNS FROM picture_cards LIKE 'is_hidden'",
+      );
+      if (columns.length === 0) {
+        await connection.query(
+          'ALTER TABLE picture_cards ADD COLUMN is_hidden BOOLEAN NOT NULL DEFAULT FALSE',
+        );
       }
     } finally {
       connection.release();

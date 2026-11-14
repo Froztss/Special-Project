@@ -67,12 +67,15 @@ Groups run in dependency order: **1 → 2 → 3 → 4 → 5**. Tasks within a gr
 
 ## Group 5 — Cards, progress, settings & hardening
 
-- [ ] **5.1 Card listing** — `GET /api/cards?childId=` returning shared defaults plus that child's custom cards, grouped by category. (FR-COMM-01/02)
-- [ ] **5.2 Custom card management** — `POST /api/cards` (label, category, predefined icon); `DELETE /api/cards/:id` for own custom cards only; hide support. (FR-COMM-06/07)
-- [ ] **5.3 Progress endpoint** — `GET /api/progress/:childId?range=7d`: today's done/total/percentage, per-day completion for the last 7 days, recent completions with date/time. (FR-PROG-01–03)
-- [ ] **5.4 Settings & profile** — get/update `font_size`, `contrast`, `sound_on` (persisted in DB); edit own profile name. (FR-SET-01/05)
+- **Implementation note:** Cards and settings use the Group 1 MySQL layer, and protected routes use the Group 2 JWT middleware. Progress reads the current in-memory Group 4 schedule/task store until that group receives database persistence. API tests inject in-memory repositories.
+- [x] **5.1 Card listing** — `GET /api/cards?childId=` returning shared defaults plus that child's visible custom cards, grouped by category; `includeHidden=true` is available for staff management. (FR-COMM-01/02)
+- [x] **5.2 Custom card management** — `POST /api/cards` (label, category, predefined icon); `DELETE /api/cards/:id` and `PATCH /api/cards/:id` with `{ "hidden": boolean }` for own custom cards only. (FR-COMM-06/07)
+- [x] **5.3 Progress endpoint** — `GET /api/progress/:childId?range=7d`: today's done/total/percentage, seven UTC calendar days including today, and recent completions with timestamps. Empty days return zero counts and percentage. (FR-PROG-01–03)
+- [x] **5.4 Settings & profile** — `GET, PUT /api/settings` for `font_size`, `contrast`, `sound_on`; `GET, PATCH /api/auth/me` for the current profile name. Settings and profile updates persist through MySQL. (FR-SET-01/05)
 - [ ] **5.5 Full API test suite** — vitest + supertest across all §6.2 endpoints: status codes, validation failures, and cross-user isolation on children, schedules, tasks and cards; test DB setup/teardown. (§9.2, NFR-SEC-06)
 - [ ] **5.6 Docs & acceptance pass** — README setup steps incl. MySQL, complete `.env.example` (NFR-MAIN-02); verify MVP acceptance items 1–6 (§9.1) through the API alone.
+
+**Remaining blockers:** 5.5 still needs database-backed test setup/teardown. 5.6 cannot verify the whole SRS acceptance list through the API alone because TTS/phrase behavior is client-side (and the responsive criterion is UI-only).
 
 **Group exit criteria:** every §6.2 endpoint implemented and tested; the backend alone satisfies SRS §9.1 items 1–6; docs complete.
 

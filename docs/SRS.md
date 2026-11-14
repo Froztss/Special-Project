@@ -312,7 +312,7 @@ The frontend communicates with the backend through a JSON REST API under `/api`.
 | --- | --- | --- |
 | Auth | `POST /api/auth/register` | Create account |
 | Auth | `POST /api/auth/login` | Log in, return JWT |
-| Auth | `GET /api/auth/me` | Current user |
+| Auth | `GET, PATCH /api/auth/me` | Read current user; update own name |
 | Children | `GET /api/children` | List own children |
 | Children | `POST /api/children` | Create child |
 | Children | `GET, PUT, DELETE /api/children/:id` | Read, update, delete child |
@@ -325,8 +325,10 @@ The frontend communicates with the backend through a JSON REST API under `/api`.
 | Tasks | `PATCH /api/tasks/:id/complete` | Mark done (and undo) |
 | Cards | `GET /api/cards?childId=` | Default and custom picture cards |
 | Cards | `POST /api/cards` | Add custom card |
-| Cards | `DELETE /api/cards/:id` | Delete custom card |
+| Cards | `PATCH /api/cards/:id` | Hide or unhide own custom card |
+| Cards | `DELETE /api/cards/:id` | Delete own custom card |
 | Progress | `GET /api/progress/:childId?range=7d` | Completion summary |
+| Settings | `GET, PUT /api/settings` | Read or update the authenticated user's settings |
 
 The API shall use standard HTTP status codes (200, 201, 400, 401, 403, 404, 409, 500) and return errors as `{ "error": "message" }`.
 
@@ -346,8 +348,8 @@ The API shall use standard HTTP status codes (200, 201, 400, 401, 403, 404, 409,
 | activities | id, name, icon, category (predefined library) |
 | schedules | id, child_id, schedule_date, created_at (unique per child and date) |
 | tasks | id, schedule_id, activity_id (nullable), name, icon, start_time (nullable), duration_min (nullable), position, status (pending / done), completed_at (nullable) |
-| picture_cards | id, child_id (null for default cards), category, label, icon, created_at |
-| settings (optional) | user_id, font_size, contrast, sound_on |
+| picture_cards | id, child_id (null for default cards), category, label, icon, is_hidden (custom cards only, default false), created_at |
+| settings | user_id, font_size, contrast, sound_on |
 
 ### 7.2 Relationships
 

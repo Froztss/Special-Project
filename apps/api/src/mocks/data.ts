@@ -1,4 +1,4 @@
-// Mock stand-in for the Group 1 MySQL layer, used by Groups 3 and 4.
+// Mock stand-in for Group 1 persistence, used by child, schedule, task, and progress routes.
 // In-memory only; replace with parameterized SQL while keeping these signatures.
 import type { Activity, Child, ChildProfileInput, ChildProfileUpdate } from '@starter/shared';
 
@@ -26,7 +26,8 @@ export interface Task {
 
 export const PREDEFINED_ICONS: string[] = [
   '☀️', '🪥', '🧼', '🍎', '👕', '🚽', '🚌', '📚', '🧸', '🛁', '🌙', '🥪',
-  '⭐', '🎯', '🧩', '🎨', '🎵', '🏃', '💧', '🥛', '🍞', '😴', '🎉', '❤️', '🙌', '📺',
+  '⭐', '🎯', '🧩', '🎨', '🎵', '🏃', '💧', '🥛', '🍞', '🍚', '😴', '🎉', '❤️', '🙌',
+  '📺', '😊', '😢',
 ];
 
 const ACTIVITIES: Activity[] = [

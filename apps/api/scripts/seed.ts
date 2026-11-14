@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import type { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { DEFAULT_PICTURE_CARDS } from '../src/group5/repository.js';
 import { closeDatabasePool, getDatabasePool } from '../src/db/pool.js';
 
 const activities = [
@@ -14,19 +15,6 @@ const activities = [
   { name: 'Play', icon: '🧸', category: 'play' },
   { name: 'Bath', icon: '🛁', category: 'hygiene' },
   { name: 'Get ready for bed', icon: '🌙', category: 'other' },
-] as const;
-
-const pictureCards = [
-  { category: 'Food', label: 'Water', icon: '💧' },
-  { category: 'Food', label: 'Milk', icon: '🥛' },
-  { category: 'Food', label: 'Rice', icon: '🍚' },
-  { category: 'Food', label: 'Bread', icon: '🍞' },
-  { category: 'Emotions', label: 'Happy', icon: '😊' },
-  { category: 'Emotions', label: 'Sad', icon: '😢' },
-  { category: 'Emotions', label: 'Tired', icon: '😴' },
-  { category: 'Activities', label: 'Play', icon: '🧸' },
-  { category: 'Activities', label: 'TV', icon: '📺' },
-  { category: 'Needs', label: 'Toilet', icon: '🚽' },
 ] as const;
 
 const demoChildren = [
@@ -103,7 +91,7 @@ async function seedData(): Promise<void> {
         );
       }
 
-      for (const card of pictureCards) {
+      for (const card of DEFAULT_PICTURE_CARDS) {
         await connection.execute(
           `INSERT INTO picture_cards (child_id, category, label, icon)
            SELECT NULL, ?, ?, ?
