@@ -1,6 +1,8 @@
 import cors from 'cors';
 import express from 'express';
 import { errorHandler } from './lib/errors.js';
+import { activitiesRouter } from './routes/activities.js';
+import { childrenRouter } from './routes/children.js';
 import { healthRouter } from './routes/health.js';
 import { schedulesRouter } from './routes/schedules.js';
 import { tasksRouter } from './routes/tasks.js';
@@ -15,6 +17,8 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '100kb' }));
 app.use('/api/health', healthRouter);
+app.use('/api/children', childrenRouter);
+app.use('/api/activities', activitiesRouter);
 app.use('/api/schedules', schedulesRouter);
 app.use('/api/tasks', tasksRouter);
 app.use((_req, res) => {
