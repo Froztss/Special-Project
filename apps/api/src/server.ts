@@ -1,5 +1,8 @@
 import 'dotenv/config';
 import { app } from './app.js';
+import { getJwtSecret } from './config.js';
+
+getJwtSecret(); // fail fast if JWT_SECRET is missing
 
 const port = Number(process.env.PORT ?? 3001);
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
