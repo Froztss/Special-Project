@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "db:schema": "tsx scripts/schema.ts",
     "db:seed": "tsx scripts/seed.ts",
+    "pretest": "npm run build -w @starter/shared",
+    "test": "vitest run",
     "start": "node dist/server.js"
   },
   "dependencies": {
@@ -23,6 +25,9 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "tsx": "^4.20.6"
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.2",
+    "tsx": "^4.20.6",
+    "vitest": "^5.1.0"
   }
 }

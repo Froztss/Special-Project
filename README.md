@@ -6,11 +6,12 @@ An npm workspace with React + Vite, Express, and a shared types package. Require
 apps/
   api/
     src/
-      routes/health.ts   # GET /api/health
-      db/pool.ts         # MySQL pool and connectivity checks
-      middleware.ts      # Validation, async routes, and API errors
-      app.ts             # Express application and CORS
-      server.ts          # Environment, listener, shutdown
+      db/pool.ts          # MySQL pool and connectivity checks
+      lib/errors.ts       # Async routes and API errors
+      lib/validate.ts     # Request validation helpers
+      routes/health.ts    # GET /api/health
+      app.ts              # Express application and CORS
+      server.ts           # Environment, listener, shutdown
     scripts/
       schema.ts          # Apply schema.sql
       seed.ts            # Seed library and demo schedules
@@ -29,7 +30,8 @@ apps/
     tsconfig.json
 packages/
   shared/
-    src/index.ts        # Shared contracts (type-only imports)
+    src/index.ts        # Shared API contracts
+    src/schemas.ts      # Shared Zod schemas
     tsconfig.json
 package.json
 tsconfig.base.json
@@ -57,7 +59,7 @@ The seed-only demo caregiver has no login password; create a normal account to u
 
 - `npm run dev`: run both apps with automatic reload.
 - `npm run typecheck`: check every workspace.
-- `npm run build`: compile the API and build the frontend.
+- `npm run build`: compile shared schemas and the API, then build the frontend.
 - `npm run db:schema`: create the database tables (the database itself must already exist).
 - `npm run db:seed`: add the activity library, default cards, and demo schedules.
 - `npm start`: run the compiled API after building.

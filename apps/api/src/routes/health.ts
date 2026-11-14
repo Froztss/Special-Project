@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { HealthResponse } from '@starter/shared';
 import { checkDatabaseConnection } from '../db/pool.js';
-import { asyncHandler } from '../middleware.js';
+import { asyncHandler } from '../lib/errors.js';
 
 export const healthRouter = Router();
 healthRouter.get('/', asyncHandler(async (_req, res) => {

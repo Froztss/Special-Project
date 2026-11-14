@@ -181,7 +181,7 @@ async function seedData(): Promise<void> {
                duration_min = VALUES(duration_min),
                status = 'pending',
                completed_at = NULL`,
-            [scheduleId, task.startTime, task.duration, index, activityId],
+            [scheduleId, task.startTime, task.duration, index + 1, activityId],
           );
         }
       }

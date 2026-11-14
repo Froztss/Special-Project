@@ -51,13 +51,15 @@ Groups run in dependency order: **1 → 2 → 3 → 4 → 5**. Tasks within a gr
 
 ## Group 4 — Schedules & tasks (SCH + TASK)
 
-- [ ] **4.1 Schedule read** — `GET /api/schedules?childId=&date=` returning the schedule with tasks ordered by `position`; ownership via the child. (FR-SCH-02, FR-TASK-05)
-- [ ] **4.2 Schedule create & copy** — `POST /api/schedules` for child + date (409 on duplicate date); optional `copyFrom` date duplicates that day's tasks. (FR-SCH-02/09)
-- [ ] **4.3 Schedule update & delete** — `PUT, DELETE /api/schedules/:id` with ownership checks.
-- [ ] **4.4 Task add & edit** — `POST /api/tasks` (library activity or custom name + predefined icon, FR-SCH-08); `PUT /api/tasks/:id` for optional `start_time` (HH:MM), `duration_min`, and `position` reordering. (FR-SCH-04/05)
-- [ ] **4.5 Task remove** — `DELETE /api/tasks/:id` with ownership through the schedule's child. (FR-SCH-06)
-- [ ] **4.6 Complete & undo** — `PATCH /api/tasks/:id/complete`: set `done` + `completed_at` timestamp; undo returns to `pending` and clears it. (FR-TASK-01–04)
-- [ ] **4.7 Schedule/task tests** — create → add → reorder → complete → undo flow; duplicate-date 409; cross-user access rejected; state survives a server restart. (NFR-REL-01, NFR-SEC-06)
+> **Status note:** Group 4 is implemented ahead of Groups 1–3 and runs on temporary mocks in `apps/api/src/mocks/` (Bearer token = mock user id; in-memory children/activities/schedules/tasks). Swap in the real JWT `requireAuth` and MySQL data access when Groups 1–3 land; route handlers, zod schemas and tests stay as they are. The 4.7 restart-persistence check is a `todo` test until the real DB exists.
+
+- [x] **4.1 Schedule read** — `GET /api/schedules?childId=&date=` returning the schedule with tasks ordered by `position`; ownership via the child. (FR-SCH-02, FR-TASK-05)
+- [x] **4.2 Schedule create & copy** — `POST /api/schedules` for child + date (409 on duplicate date); optional `copyFrom` date duplicates that day's tasks. (FR-SCH-02/09)
+- [x] **4.3 Schedule update & delete** — `PUT, DELETE /api/schedules/:id` with ownership checks.
+- [x] **4.4 Task add & edit** — `POST /api/tasks` (library activity or custom name + predefined icon, FR-SCH-08); `PUT /api/tasks/:id` for optional `start_time` (HH:MM), `duration_min`, and `position` reordering. (FR-SCH-04/05)
+- [x] **4.5 Task remove** — `DELETE /api/tasks/:id` with ownership through the schedule's child. (FR-SCH-06)
+- [x] **4.6 Complete & undo** — `PATCH /api/tasks/:id/complete`: set `done` + `completed_at` timestamp; undo returns to `pending` and clears it. (FR-TASK-01–04)
+- [x] **4.7 Schedule/task tests** — create → add → reorder → complete → undo flow; duplicate-date 409; cross-user access rejected; state survives a server restart *(restart check deferred — see note)*. (NFR-REL-01, NFR-SEC-06)
 
 **Group exit criteria:** the full schedule/task lifecycle works via API, ordered and timestamped, with ownership enforced at every step.
 
