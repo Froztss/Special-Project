@@ -7,6 +7,7 @@ const { app, alice, bob } = await createTestApp();
 
 function isoDay(offset = 0): string {
   const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
   date.setUTCDate(date.getUTCDate() + offset);
   return date.toISOString().slice(0, 10);
 }
@@ -43,8 +44,8 @@ describe('GET /api/progress/:childId (task 5.3)', () => {
     await buildDay(1, isoDay(0), 3, 1);
     const res = await request(app).get('/api/progress/1').set(alice).query({ range: '7d' });
     expect(res.status).toBe(200);
-    expect(res.body.today).toMatchObject({ done: 1, total: 3 });
-    expect(res.body.today.percentage).toBeCloseTo(100 / 3, 0);
+    expect(res.body).toMatchObject({ child_id: 1, range: '7d' });
+    expect(res.body.today).toMatchObject({ date: isoDay(0), done: 1, total: 3, percentage: 33 });
   });
 
   it('reports zero percentage when there are no tasks today', async () => {
@@ -59,33 +60,32 @@ describe('GET /api/progress/:childId (task 5.3)', () => {
     await buildDay(1, isoDay(-1), 2, 1);
     const res = await request(app).get('/api/progress/1').set(alice).query({ range: '7d' });
     expect(res.status).toBe(200);
-    expect(res.body.days).toHaveLength(7);
-    const dates = (res.body.days as { date: string }[]).map((day) => day.date);
-    expect(dates).toContain(isoDay(0));
-    expect(dates).toContain(isoDay(-6));
-    const today = (res.body.days as { date: string; done: number; total: number }[])
-      .find((day) => day.date === isoDay(0));
-    expect(today).toMatchObject({ done: 4, total: 4 });
-    const yesterday = (res.body.days as { date: string; done: number; total: number }[])
-      .find((day) => day.date === isoDay(-1));
-    expect(yesterday).toMatchObject({ done: 1, total: 2 });
+    expect(res.body.last_7_days).toHaveLength(7);
+    const days = res.body.last_7_days as { date: string; done: number; total: number; percentage: number }[];
+    expect(days[0].date).toBe(isoDay(-6));
+    expect(days[6]).toMatchObject({ date: isoDay(0), done: 4, total: 4, percentage: 100 });
+    expect(days[5]).toMatchObject({ date: isoDay(-1), done: 1, total: 2, percentage: 50 });
   });
 
-  it('lists recent completions with a date and time', async () => {
-    await buildDay(1, isoDay(0), 2, 1);
+  it('lists recent completions with a date and time, newest first', async () => {
+    await buildDay(1, isoDay(0), 2, 2);
     const res = await request(app).get('/api/progress/1').set(alice).query({ range: '7d' });
     expect(res.status).toBe(200);
-    expect(Array.isArray(res.body.recent)).toBe(true);
-    expect(res.body.recent.length).toBeGreaterThan(0);
-    const entry = res.body.recent[0];
-    expect(entry.name).toBeTypeOf('string');
+    expect(res.body.recent_completions).toHaveLength(2);
+    const entry = res.body.recent_completions[0];
+    expect(entry).toMatchObject({
+      task_id: expect.any(Number),
+      name: expect.any(String),
+      icon: expect.any(String),
+      schedule_date: isoDay(0),
+    });
     expect(Number.isNaN(Date.parse(entry.completed_at))).toBe(false);
   });
 
-  it('rejects a malformed childId or range with 400', async () => {
+  it('rejects a malformed childId or unsupported range with 400', async () => {
     const badId = await request(app).get('/api/progress/abc').set(alice).query({ range: '7d' });
     expect(badId.status).toBe(400);
-    const badRange = await request(app).get('/api/progress/1').set(alice).query({ range: 'forever' });
+    const badRange = await request(app).get('/api/progress/1').set(alice).query({ range: '30d' });
     expect(badRange.status).toBe(400);
   });
 
