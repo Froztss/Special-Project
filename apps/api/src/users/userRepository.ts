@@ -28,6 +28,7 @@ export interface UserRepository {
   insert(user: NewUser): Promise<PublicUser | null>;
   findByEmailWithHash(email: string): Promise<UserWithHash | null>;
   findById(id: number): Promise<PublicUser | null>;
+  updateName(id: number, name: string): Promise<PublicUser | null>;
 }
 
 export class InMemoryUserRepository implements UserRepository {
@@ -48,6 +49,13 @@ export class InMemoryUserRepository implements UserRepository {
   async findById(id: number): Promise<PublicUser | null> {
     const row = this.users.find((u) => u.id === id);
     return row ? toPublic(row) : null;
+  }
+
+  async updateName(id: number, name: string): Promise<PublicUser | null> {
+    const user = this.users.find((row) => row.id === id);
+    if (!user) return null;
+    user.name = name;
+    return toPublic(user);
   }
 }
 

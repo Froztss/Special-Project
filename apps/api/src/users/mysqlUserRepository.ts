@@ -45,4 +45,9 @@ export class MySqlUserRepository implements UserRepository {
     );
     return rows[0] ? toPublic(rows[0]) : null;
   }
+
+  async updateName(id: number, name: string): Promise<PublicUser | null> {
+    await getDatabasePool().execute('UPDATE users SET name = ? WHERE id = ?', [name, id]);
+    return this.findById(id);
+  }
 }

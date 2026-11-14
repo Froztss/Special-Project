@@ -7,6 +7,7 @@ import { HttpError } from '../lib/errors.js';
 import { parse } from '../lib/validate.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import type { UserRepository } from '../users/userRepository.js';
+import { updateProfileSchema } from '@starter/shared';
 
 const BCRYPT_ROUNDS = 12;
 // Compared against when the email is unknown so login timing doesn't reveal it.
@@ -45,6 +46,13 @@ export function authRouter(users: UserRepository): Router {
   router.get('/me', requireAuth(users), (req, res) => {
     const { id, name, email, role } = req.user!;
     res.json({ id, name, email, role });
+  });
+
+  router.patch('/me', requireAuth(users), async (req, res) => {
+    const { name } = parse(updateProfileSchema, req.body);
+    const user = await users.updateName(req.user!.id, name);
+    if (!user) throw new HttpError(404, 'User not found');
+    res.json(user);
   });
 
   return router;

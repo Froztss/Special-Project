@@ -1,10 +1,9 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { app } from '../app.js';
 import { findScheduleByChildAndDate, resetStore, tasksForSchedule } from '../mocks/data.js';
+import { createTestApp } from '../testing/testApp.js';
 
-const alice = { Authorization: 'Bearer 1' };
-const bob = { Authorization: 'Bearer 2' };
+const { app, alice, bob } = await createTestApp();
 const profile = { name: 'Sam', age: 5, delay_domain: 'speech', avatar: '🐼' };
 
 beforeEach(() => resetStore());
