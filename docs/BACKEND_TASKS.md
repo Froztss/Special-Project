@@ -19,11 +19,11 @@ Groups run in dependency order: **1 → 2 → 3 → 4 → 5**. Tasks within a gr
 
 ## Group 1 — Database foundation & API plumbing
 
-- [ ] **1.1 MySQL connection module** — `mysql2/promise` pool configured by env (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`); add vars to `apps/api/.env.example`; verify connectivity at startup and expose a DB check on `/api/health`. (NFR-SEC-02/05, NFR-REL-01)
-- [ ] **1.2 Schema script** — `schema.sql` with all §7.1 tables (`users`, `children`, `activities`, `schedules`, `tasks`, `picture_cards`, `settings`); unique `users.email`; unique `(child_id, schedule_date)`; FK cascades child → schedules → tasks and child → custom cards (§7.2); `npm run db:schema`.
-- [ ] **1.3 Seed script** — idempotent seeds: activity library with icons/categories (FR-SCH-01), default picture cards in Food / Emotions / Activities / Needs (FR-COMM-02), three demo children with sample schedules (§2.6); `npm run db:seed`.
-- [ ] **1.4 Uniform error handling** — central error middleware returning `{ "error": "message" }` with the §6.2 status codes (400/401/403/404/409/500); async route wrapper so rejections reach it; keep the existing JSON 404.
-- [ ] **1.5 Validation & CORS setup** — zod installed, shared schema home in `packages/shared`, a parse-or-400 middleware/helper for route bodies and queries; `cors` restricted to the configured frontend origin (NFR-SEC-03/04).
+- [x] **1.1 MySQL connection module** — `mysql2/promise` pool configured by env (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`); add vars to `apps/api/.env.example`; verify connectivity at startup and expose a DB check on `/api/health`. (NFR-SEC-02/05, NFR-REL-01)
+- [x] **1.2 Schema script** — `schema.sql` with all §7.1 tables (`users`, `children`, `activities`, `schedules`, `tasks`, `picture_cards`, `settings`); unique `users.email`; unique `(child_id, schedule_date)`; FK cascades child → schedules → tasks and child → custom cards (§7.2); `npm run db:schema`.
+- [x] **1.3 Seed script** — idempotent seeds: activity library with icons/categories (FR-SCH-01), default picture cards in Food / Emotions / Activities / Needs (FR-COMM-02), three demo children with sample schedules (§2.6); `npm run db:seed`.
+- [x] **1.4 Uniform error handling** — central error middleware returning `{ "error": "message" }` with the §6.2 status codes (400/401/403/404/409/500); async route wrapper so rejections reach it; keep the existing JSON 404.
+- [x] **1.5 Validation & CORS setup** — zod installed, shared schema home in `packages/shared`, a parse-or-400 middleware/helper for route bodies and queries; `cors` restricted to the configured frontend origin (NFR-SEC-03/04).
 
 **Group exit criteria:** schema + seeds apply cleanly on local MySQL; API boots with DB connectivity reported; every error uses the uniform shape; validation and CORS plumbing ready for feature routes.
 
