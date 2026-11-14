@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp } from '../../src/testing/testApp.js';
 import { resetStore } from '../../src/mocks/data.js';
 
-const { app, alice, bob } = await createTestApp();
+const { app, alice, bob, group5Repository } = await createTestApp();
 
 const DATE = '2026-11-14';
 
@@ -22,7 +22,10 @@ const PROTECTED: [string, string][] = [
   ['get', '/api/auth/me'],
 ];
 
-beforeEach(() => resetStore());
+beforeEach(() => {
+  resetStore();
+  group5Repository.reset();
+});
 
 describe('uniform authentication guard (task 5.5)', () => {
   it.each(PROTECTED)('rejects %s %s without a token', async (method, path) => {
@@ -106,7 +109,10 @@ describe('end-to-end MVP flow through the API (task 5.5)', () => {
       .query({ range: '7d' });
     expect(progress.status).toBe(200);
     expect(progress.body.today).toMatchObject({ done: 1, total: 1 });
-    const settings = await request(app).put('/api/settings').set(alice).send({ sound_on: false });
+    const settings = await request(app)
+      .put('/api/settings')
+      .set(alice)
+      .send({ font_size: 'medium', contrast: 'normal', sound_on: false });
     expect(settings.status).toBe(200);
   });
 });
