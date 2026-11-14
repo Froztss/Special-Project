@@ -4,11 +4,14 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp } from '../../src/testing/testApp.js';
 import { resetStore } from '../../src/mocks/data.js';
 
-const { app, alice, bob } = await createTestApp();
+const { app, alice, bob, group5Repository } = await createTestApp();
 
 const DATE = '2026-11-14';
 
-beforeEach(() => resetStore());
+beforeEach(() => {
+  resetStore();
+  group5Repository.reset();
+});
 
 describe('MVP acceptance through the API (task 5.6, SRS 9.1)', () => {
   it('item 1: a staff user can register, log in and log out', async () => {
@@ -80,7 +83,7 @@ describe('MVP acceptance through the API (task 5.6, SRS 9.1)', () => {
   it('item 5: the communication board serves cards with a label and icon to speak', async () => {
     const res = await request(app).get('/api/cards').set(alice).query({ childId: 1 });
     expect(res.status).toBe(200);
-    const water = (res.body as { label: string; icon: string }[]).find((card) => card.label === 'Water');
+    const water = (res.body.Food as { label: string; icon: string }[]).find((card) => card.label === 'Water');
     expect(water).toBeTruthy();
     expect(water!.icon.length).toBeGreaterThan(0);
   });
@@ -96,7 +99,7 @@ describe('MVP acceptance through the API (task 5.6, SRS 9.1)', () => {
     const res = await request(app).get('/api/progress/1').set(alice).query({ range: '7d' });
     expect(res.status).toBe(200);
     expect(res.body.today).toMatchObject({ done: 1, total: 1 });
-    expect(res.body.days).toHaveLength(7);
+    expect(res.body.last_7_days).toHaveLength(7);
   });
 
   it.todo('item 5: TTS speaks a tapped card and builds a phrase (client-side, FR-COMM-03/04)');
